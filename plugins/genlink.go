@@ -55,7 +55,7 @@ func GenLink(bot *gotgbot.Bot, ctx *ext.Context) error {
 		// Try to access the chat
 		chatID, err = strconv.ParseInt(chatString, 10, 64)
 		if err != nil {
-			chatID, err = helpers.IDFromUsername(bot, chatString)
+			chatID, _, err = helpers.IDFromUsername(bot, chatString)
 			if err != nil {
 				update.Reply(bot, config.BatchUnknownChat, &gotgbot.SendMessageOpts{ParseMode: gotgbot.ParseModeHTML})
 				return nil
@@ -63,13 +63,15 @@ func GenLink(bot *gotgbot.Bot, ctx *ext.Context) error {
 		} else {
 			chatID = fixChatID(chatID)
 
-			_, err := bot.GetChat(chatID, &gotgbot.GetChatOpts{})
+			_, err = bot.GetChat(chatID, &gotgbot.GetChatOpts{})
 			if err != nil {
 				update.Reply(bot, config.BatchUnknownChat, &gotgbot.SendMessageOpts{ParseMode: gotgbot.ParseModeHTML})
 				return nil
 			}
 		}
 	}
+
+	go logBatch(bot, chatID, messageID, messageID, "N/A", user)
 
 	link := fmt.Sprintf("https://t.me/%s?start=%s", bot.Username, url.EncodeData(chatID, messageID, messageID))
 

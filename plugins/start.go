@@ -105,6 +105,8 @@ func sendBatch(bot *gotgbot.Bot, toChatID, fromChatID, startID, endID int64, fro
 			default:
 				fmt.Printf("sendBatch: unknown error: %v", err)
 			}
+
+			continue
 		}
 
 		autodelete.InsertAutodel(autodelete.AutodelData{ChatID: toChatID, MessageID: m.MessageId})

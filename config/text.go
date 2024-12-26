@@ -91,6 +91,16 @@ var (
 	FsubMessage = `<i><b>👋 Hᴇʏ ᴛʜᴇʀᴇ {mention},</b></i>
 Pʟᴇᴀsᴇ <b>ᴊᴏɪɴ</b> ᴍʏ <b>ᴄʜᴀɴɴᴇʟs</b> ᴜsɪɴɢ ᴛʜᴇ ʟɪɴᴋs ʙᴇʟᴏᴡ ᴛᴏ ᴀᴄᴄᴇss ᴛʜɪs ᴄᴏɴᴛᴇɴᴛ 👇
 `
+	// Batch Log message
+	BatchLogMessage = `📄 <b>New Batch Created by <tg-spoiler>{mention}</tg-spoiler></b>
+<i>
+<b>Channel Name</b>: <code>{channel_name}</code>
+<b>Channel ID</b>: <code>{channel_id}</code>
+<b>Batch Size</b>: <code>{size}</code>
+<b>Start</b>: <code>{start_id}</code>
+<b>End</b>: <code>{end_id}</code>
+</i>
+`
 )
 
 // GetCommand returns the content for a command.

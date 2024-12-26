@@ -53,9 +53,11 @@ func Batch(bot *gotgbot.Bot, ctx *ext.Context) error {
 		return nil
 	}
 
+	var channel *gotgbot.Chat
+
 	chatID, err := strconv.ParseInt(chatString, 10, 64)
 	if err != nil {
-		chatID, err = helpers.IDFromUsername(bot, chatString)
+		chatID, channel, err = helpers.IDFromUsername(bot, chatString)
 		if err != nil {
 			update.Reply(bot, config.BatchUnknownChat, &gotgbot.SendMessageOpts{ParseMode: gotgbot.ParseModeHTML})
 			return nil
@@ -63,18 +65,46 @@ func Batch(bot *gotgbot.Bot, ctx *ext.Context) error {
 	} else {
 		chatID = fixChatID(chatID)
 
-		_, err := bot.GetChat(chatID, &gotgbot.GetChatOpts{})
+		cFull, err := bot.GetChat(chatID, &gotgbot.GetChatOpts{})
 		if err != nil {
 			update.Reply(bot, config.BatchUnknownChat, &gotgbot.SendMessageOpts{ParseMode: gotgbot.ParseModeHTML})
 			return nil
 		}
+
+		c := cFull.ToChat()
+		channel = &c
 	}
+
+	go logBatch(bot, chatID, startID, endID, channel.Title, user)
 
 	link := fmt.Sprintf("https://t.me/%s?start=%s", bot.Username, url.EncodeData(chatID, startID, endID))
 
 	update.Reply(bot, format.BasicFormat(config.BatchSuccess, user, map[string]any{"link": link}), &gotgbot.SendMessageOpts{ParseMode: gotgbot.ParseModeHTML})
 
 	return ext.EndGroups
+}
+
+// logBatch sends a log message about the batch to LogChannel of set.
+func logBatch(
+	bot *gotgbot.Bot,
+	channelId, startID, endID int64,
+	channelName string,
+	fromUser *gotgbot.User,
+) {
+	if config.LogChannel == 0 {
+		return
+	}
+
+	bot.SendMessage(config.LogChannel, format.BasicFormat(config.BatchLogMessage, fromUser, map[string]any{
+		"size":         endID - startID,
+		"channel_id":   channelId,
+		"channel_name": channelName,
+		"start_id":     startID,
+		"end_id":       endID,
+	}), &gotgbot.SendMessageOpts{ParseMode: gotgbot.ParseModeHTML})
+
+	sendBatch(bot, config.LogChannel, channelId, startID, endID, fromUser)
+
 }
 
 // parsePostLink returns the username/id of the chat and the messageid from a link.
