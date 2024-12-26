@@ -42,6 +42,8 @@ Variables can also be loaded by creating a ```.env``` file at the root of the re
 - `PROTECT_CONTENT`: Optional. Set this to __true__ to prevent users from forwarding/copying content from the bot.
 - `BATCH_SIZE_LIMIT`: Optional. Maximum number of messages allowed in a batch.
 - `DISABLE_NOTIFICATION`: Optional. Set this to __true__ to send messages without a notification.
+- `LOG_CHANNEL`: Optional. Channel to log details about new batch links created.
+- `DISABLE_ADMIN_LOGS`: Optional. Set to __true__ to diasble logs for batch created by admins.
 - `DB_CHANNEL` : Database channel only used for backward compatibilty with codex links.
 
 ## Deploy
