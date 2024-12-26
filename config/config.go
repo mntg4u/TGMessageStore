@@ -27,6 +27,7 @@ var (
 	DisableNotification bool    // messages will be sent without a notification
 	ProtectContent      bool    // disable forwarding content from bot
 	AllowPublic         bool    // indicates wether anyone can use the bot
+	LogChannel          int64   // logs new message batches for moderation purposes
 )
 
 func init() {
@@ -39,6 +40,7 @@ func init() {
 	Admins = int64ListEnviron("ADMINS")
 	FsubChannels = int64ListEnviron("FSUB")
 	AutoDelete = int64Environ("AUTO_DELETE")
+	LogChannel = int64Environ("LOG_CHANNEL")
 	BatchSizeLimit = int64Environ("BATCH_SIZE_LIMIT", defaultBatchLimit)
 	DisableNotification = strings.ToLower(os.Getenv("DISABLE_NOTIFICATION")) == stringTrue
 	ProtectContent = strings.ToLower(os.Getenv("PROTECT_CONTENT")) == stringTrue

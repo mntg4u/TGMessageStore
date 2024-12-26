@@ -72,32 +72,30 @@ func Start(bot *gotgbot.Bot, ctx *ext.Context) error {
 		return nil
 	}
 
-	sendBatch(bot, update, chatID, startID, endID)
+	sendBatch(bot, update.Chat.Id, chatID, startID, endID, user)
 
 	return nil
 }
 
 // sendBatch sends a batch from the input data to the target.
-func sendBatch(bot *gotgbot.Bot, inputMessage *gotgbot.Message, chatID, startID, endID int64) {
-	statMessage, err := inputMessage.Reply(bot, format.BasicFormat(config.StartGetBatch, inputMessage.From), &gotgbot.SendMessageOpts{ParseMode: gotgbot.ParseModeHTML})
+func sendBatch(bot *gotgbot.Bot, toChatID, fromChatID, startID, endID int64, fromUser *gotgbot.User) {
+	statMessage, err := bot.SendMessage(toChatID, format.BasicFormat(config.StartGetBatch, fromUser), &gotgbot.SendMessageOpts{ParseMode: gotgbot.ParseModeHTML})
 	if err != nil {
 		fmt.Printf("sendBatch: failed to send stat: %v\n", err)
 		return
 	}
 
 	if endID-startID > config.BatchSizeLimit {
-		statMessage.EditText(bot, format.BasicFormat(config.BatchTooLarge, inputMessage.From, map[string]any{"limit": config.BatchSizeLimit}), &gotgbot.EditMessageTextOpts{ParseMode: gotgbot.ParseModeHTML})
+		statMessage.EditText(bot, format.BasicFormat(config.BatchTooLarge, fromUser, map[string]any{"limit": config.BatchSizeLimit}), &gotgbot.EditMessageTextOpts{ParseMode: gotgbot.ParseModeHTML})
 		return
 	}
 
-	targetChatID := inputMessage.Chat.Id // receiving party's id
-
 	for i := startID; i <= endID; i++ {
-		m, err := bot.CopyMessage(targetChatID, chatID, i, &gotgbot.CopyMessageOpts{ProtectContent: config.ProtectContent, DisableNotification: config.DisableNotification})
+		m, err := bot.CopyMessage(toChatID, fromChatID, i, &gotgbot.CopyMessageOpts{ProtectContent: config.ProtectContent, DisableNotification: config.DisableNotification})
 		if err != nil {
 			switch {
 			case strings.Contains(err.Error(), "chat not found"):
-				statMessage.EditText(bot, format.BasicFormat(config.BatchUnknownChat, inputMessage.From), &gotgbot.EditMessageTextOpts{})
+				statMessage.EditText(bot, format.BasicFormat(config.BatchUnknownChat, fromUser), &gotgbot.EditMessageTextOpts{})
 				return
 			case strings.Contains(err.Error(), "message not found"):
 				// ignore and continue
@@ -109,7 +107,7 @@ func sendBatch(bot *gotgbot.Bot, inputMessage *gotgbot.Message, chatID, startID,
 			}
 		}
 
-		autodelete.InsertAutodel(autodelete.AutodelData{ChatID: targetChatID, MessageID: m.MessageId})
+		autodelete.InsertAutodel(autodelete.AutodelData{ChatID: toChatID, MessageID: m.MessageId})
 	}
 
 	statMessage.Delete(bot, &gotgbot.DeleteMessageOpts{})
