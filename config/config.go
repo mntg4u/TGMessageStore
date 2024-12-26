@@ -25,6 +25,7 @@ var (
 	FsubChannels        []int64 // list of force subscribe channels
 	BatchSizeLimit      int64   // maximum messages allowed in a batch
 	DisableNotification bool    // messages will be sent without a notification
+	DisableAdminLogs    bool    // batch wont be logged if created by admins
 	ProtectContent      bool    // disable forwarding content from bot
 	AllowPublic         bool    // indicates wether anyone can use the bot
 	LogChannel          int64   // logs new message batches for moderation purposes
@@ -43,6 +44,7 @@ func init() {
 	LogChannel = int64Environ("LOG_CHANNEL")
 	BatchSizeLimit = int64Environ("BATCH_SIZE_LIMIT", defaultBatchLimit)
 	DisableNotification = strings.ToLower(os.Getenv("DISABLE_NOTIFICATION")) == stringTrue
+	DisableAdminLogs = strings.ToLower(os.Getenv("DISABLE_ADMIN_LOGS")) == stringTrue
 	ProtectContent = strings.ToLower(os.Getenv("PROTECT_CONTENT")) == stringTrue
 	AllowPublic = strings.ToLower(os.Getenv("ALLOW_PUBLIC")) == stringTrue || len(Admins) < 1
 }

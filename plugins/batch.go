@@ -95,6 +95,10 @@ func logBatch(
 		return
 	}
 
+	if fromUser != nil && config.DisableAdminLogs && auth.CheckUser(fromUser.Id) {
+		return
+	}
+
 	bot.SendMessage(config.LogChannel, format.BasicFormat(config.BatchLogMessage, fromUser, map[string]any{
 		"size":         endID - startID,
 		"channel_id":   channelId,
