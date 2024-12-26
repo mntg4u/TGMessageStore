@@ -41,7 +41,7 @@ func init() {
 	AutoDelete = int64Environ("AUTO_DELETE")
 	BatchSizeLimit = int64Environ("BATCH_SIZE_LIMIT", defaultBatchLimit)
 	DisableNotification = strings.ToLower(os.Getenv("DISABLE_NOTIFICATION")) == stringTrue
-	ProtectContent = strings.ToLower(os.Getenv("PUBLIC_CONTENT")) == stringTrue
+	ProtectContent = strings.ToLower(os.Getenv("PROTECT_CONTENT")) == stringTrue
 	AllowPublic = strings.ToLower(os.Getenv("ALLOW_PUBLIC")) == stringTrue || len(Admins) < 1
 }
 
